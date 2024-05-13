@@ -56,7 +56,7 @@ app.delete('/api/persons/:id',(request,response)=>{
 
 app.post('/api/persons',(request,response)=>{
   const body = request.body
-  if (!body.name || !body.phone){
+  if (!body.name || !body.number){
     return response.status(500).json({error:'Name or number missing missing'})
   }
   const data = phones.find(p=>p.name.toLowerCase()===body.name.toLowerCase())
@@ -67,8 +67,9 @@ app.post('/api/persons',(request,response)=>{
   const newPhone = {
     'id': randomValue,
     'name':body.name,
-    'phone':body.phone
+    'number':body.number
   }
+  console.log('newPhone :>> ', newPhone);
   phones = phones.concat(newPhone)
   return response.status(209).send('Created')
   
