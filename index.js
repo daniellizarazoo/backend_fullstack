@@ -74,14 +74,20 @@ app.delete('/api/persons/:id',(request,response,next)=>{
     .catch(error => next(error))
 })
 
-app.put('/api/notes/:id',(request,response,next)=>{
+app.put('/api/persons/:id', (request, response,next) => {
   const body = request.body
-
+  const id = request.params.id
   const phone = {
-    name: body.content,
-    important: body.important
+    'name':body.name,
+    'number':body.number
   }
-})
+  Phone.findByIdAndUpdate(id,phone,{new:true})
+    .then(updatedPhone =>{
+      response.json(updatedPhone)
+    })
+    .catch(error=>next(error))
+  console.log('body :>> ', body);
+});
 
 app.get('/info',(request,response)=>{
   const timeZone = new Date().toLocaleString();
