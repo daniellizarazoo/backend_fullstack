@@ -34,33 +34,33 @@ app.get('/api/persons/:id',(request,response,next)=>{
   })
 })
 
-app.post('/api/persons',(request,response)=>{
+app.post('/api/persons',(request,response,next)=>{
   const body = request.body
-
-  if (!body.name || !body.number){
-    return response.status(500).json({error:'Name or number missing missing'})
-  }
+  // if (!body.name || !body.number){
+  //   return response.status(500).json({error:'Name or number missing missing'})
+  // }
   
   Phone.find({}).then(phones=>{
-    const data = phones.find(p=>p.name.toLowerCase()===body.name.toLowerCase())
-    if(data){
-    return response.status(409).send('The name is already in the db, you must change name')
-    }
+    // const data = phones.find(p=>p.name.toLowerCase()===body.name.toLowerCase())
+    // if(data){
+    // return response.status(409).send('The name is already in the db, you must change name')
+    // }
     const newPhone = new Phone({
       'name':body.name,
       'number':body.number
     })
-    console.log('newPhone :>> ', newPhone);
     
     newPhone.save().
     then(()=>{
       console.log('phone saved')
       return response.status(200).send('Phone saved')
     })
-    .catch(error=>{
-      console.log('error', error)
-      return response.status(500).send('Error saving phone')
-    })
+    .catch(error=>next(error)
+    //   {
+    //   console.log('error', error)
+    //   return response.status(500).send(`Error saving:${error}` )
+    // }
+  )
 
   })
   // response.json(body)
@@ -81,7 +81,8 @@ app.put('/api/persons/:id', (request, response,next) => {
     'name':body.name,
     'number':body.number
   }
-  Phone.findByIdAndUpdate(id,phone,{new:true})
+  Phone.findByIdAndUpdate(id,phone,
+    {new:true,runValidators:true,context:'query'})
     .then(updatedPhone =>{
       response.json(updatedPhone)
     })
@@ -102,10 +103,12 @@ const unknownEndpoint = (request, response)=>{
 app.use(unknownEndpoint)
 
 const errorHandler =(error,request,response,next)=>{
-  console.log('error.message',error.message)
 
   if (error.name==='CastError'){
     return response.status(400).send({error:'malformatted id'})
+  }
+  else if(error.name=='MongoServerError'){
+    return response.status(400).send({error:'Some field is empty or duplicated name'})
   }
   next(error)
 }
