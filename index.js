@@ -51,11 +51,11 @@ app.post('/api/persons',(request,response,next)=>{
     })
     
     newPhone.save().
-    then(()=>{
-      console.log('phone saved')
-      return response.status(200).send('Phone saved')
-    })
-    .catch(error=>next(error)
+      then(()=>{
+        console.log('phone saved')
+        return response.status(200).send('Phone saved')
+      })
+      .catch(error=>next(error)
     //   {
     //   console.log('error', error)
     //   return response.status(500).send(`Error saving:${error}` )
@@ -109,6 +109,9 @@ const errorHandler =(error,request,response,next)=>{
   }
   else if(error.name=='MongoServerError'){
     return response.status(400).send({error:'Some field is empty or duplicated name'})
+  }
+  else if(error.name==='ValidationError'){
+    return response.status(400).send(error.message)
   }
   next(error)
 }
