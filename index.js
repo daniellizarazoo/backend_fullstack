@@ -6,7 +6,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 app.use(express.json())
 app.use(express.static('dist'))
-morgan.token('req-body', (req, res) => JSON.stringify(req.body));
+morgan.token('req-body', (req) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'));
 app.use(cors())
 
@@ -40,7 +40,7 @@ app.post('/api/persons',(request,response,next)=>{
   //   return response.status(500).json({error:'Name or number missing missing'})
   // }
   
-  Phone.find({}).then(phones=>{
+  Phone.find({}).then(()=>{
     // const data = phones.find(p=>p.name.toLowerCase()===body.name.toLowerCase())
     // if(data){
     // return response.status(409).send('The name is already in the db, you must change name')
@@ -68,7 +68,7 @@ app.post('/api/persons',(request,response,next)=>{
 
 app.delete('/api/persons/:id',(request,response,next)=>{
   Phone.findByIdAndDelete (request.params.id)
-    .then(result=>{
+    .then(()=>{
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -119,6 +119,7 @@ const errorHandler =(error,request,response,next)=>{
 app.use(errorHandler)
 
 
+// eslint-disable-next-line no-undef
 const PORT = process.env.PORT || 3001
 app.listen(PORT,()=>{
     console.log(`Server running on port ${PORT}`)
